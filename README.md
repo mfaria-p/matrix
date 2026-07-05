@@ -11,6 +11,7 @@ matrix/
   ex02.py     — lerp
   ex03.py     — dot product
   ex04.py     — norm
+  ex05.py     — cosine similarity
 ```
 
 Each exercise imports from `vector.py` and/or `matrix.py`. Run any exercise with `python ex##.py`.
@@ -147,3 +148,61 @@ Called "Manhattan" because it's like walking city blocks — no diagonals, only 
 ```python
 absval = x if x >= 0 else -x
 ```
+
+---
+
+## Exercise 05 — Cosine Similarity
+
+```python
+def angle_cos(u: Vector, v: Vector) -> float
+```
+
+Returns the cosine of the angle between two vectors.
+
+**Formula:**
+```
+cos(θ) = (u · v) / (‖u‖ × ‖v‖)
+```
+
+Just dot product divided by the product of both norms. One line — the work was already done in Ex03 and Ex04.
+
+**What the result means:**
+- `1`  → same direction (angle = 0°)
+- `0`  → perpendicular (angle = 90°)
+- `-1` → opposite directions (angle = 180°)
+
+This is why cosine similarity is so useful — it tells you the angle without you having to compute it explicitly.
+
+**Floating point note:** you may get `-0.9999999999999998` instead of `-1.0`. That's normal precision loss, not a bug.
+
+---
+
+### Bonus concept — Pearson Correlation
+
+Pearson correlation is cosine similarity applied to **mean-centered** vectors.
+
+**Centering** means subtracting the mean from every component:
+```
+u = [2, 4, 6]   →   mean = 4   →   centered = [-2, 0, 2]
+```
+The shape is identical — ups and downs are the same — but the average is now 0. You're no longer saying "this value is 6", you're saying "this value is 2 above average."
+
+**Pearson formula:**
+```
+centered_u = u - mean(u)
+centered_v = v - mean(v)
+pearson(u, v) = angle_cos(centered_u, centered_v)
+```
+
+**What it tells you:** when one value goes up, does the other tend to go up too?
+- `r = 1`  → perfect positive correlation
+- `r = -1` → perfect negative correlation
+- `r = 0`  → no linear relationship
+
+**Key difference from cosine similarity:** cosine cares about direction of raw vectors. Pearson removes the offset first, so it only measures whether the *movements* are aligned — not the absolute levels.
+
+```
+u = [1, 2, 3]   centered = [-1, 0, 1]
+v = [4, 5, 6]   centered = [-1, 0, 1]   →   pearson = 1.0
+```
+Different absolute values, identical relative movement → perfect correlation.
